@@ -32,15 +32,17 @@ class PipelineRunner:
             upsert_pipeline_run(self.db, raw_doc_id, stage_name, "running")
 
             try:
-                result = self._run_stage(stage_name, raw_doc_id)
-                upsert_pipeline_run(self.db, raw_doc_id, stage_name, "completed")
+                with self.db.begin_nested():  # SAVEPOINT — rolls back only this stage on failure
+                    result = self._run_stage(stage_name, raw_doc_id)
+                    upsert_pipeline_run(self.db, raw_doc_id, stage_name, "completed")
+                self.db.commit()
                 summary[stage_name] = f"completed: {result}"
                 logger.info(f"[{raw_doc_id}] {stage_name} completed")
             except Exception as e:
                 upsert_pipeline_run(self.db, raw_doc_id, stage_name, "failed", error_msg=str(e))
+                self.db.commit()
                 summary[stage_name] = f"FAILED: {e}"
                 logger.error(f"[{raw_doc_id}] {stage_name} failed: {e}")
-                self.db.rollback()
                 break  # Pause at failed stage; do not continue
 
         return summary
