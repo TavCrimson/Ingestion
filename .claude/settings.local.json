@@ -49,7 +49,8 @@
       "Bash(python -c \"from ingestion.db.engine import Base; print\\(Base\\)\")",
       "Bash(python -c \"from tests.conftest import db, api_key, tmp_raw_dir, mock_vector_store; print\\('All fixtures imported successfully'\\)\")",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(python -m pytest tests/test_config.py -v)"
     ]
   }
 }
