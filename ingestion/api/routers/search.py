@@ -1,6 +1,7 @@
 """POST /v1/search — keyword, semantic, or hybrid search."""
 from __future__ import annotations
 
+import logging
 import re
 from fastapi import APIRouter, Depends
 from sqlalchemy import text
@@ -8,10 +9,13 @@ from sqlalchemy.orm import Session
 
 from ingestion.api.rate_limit import rate_limit
 from ingestion.api.schemas.search import SearchRequest, SearchResponse, SearchResult
+from ingestion.config import settings
 from ingestion.db.engine import get_db
 from ingestion.db import crud
 from ingestion.embeddings.encoder import Encoder
 from ingestion.storage.vector_store import vector_store
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -61,7 +65,8 @@ def _keyword_search(db: Session, query: str, top_k: int, content_types: list | N
                 "authority_level": chunk.authority_level,
             })
         return results
-    except Exception:
+    except Exception as exc:
+        logger.error("FTS5 keyword search failed for query %r: %s", query, exc)
         return []
 
 
@@ -103,12 +108,12 @@ def _merge_results(keyword: list[dict], semantic: list[dict], top_k: int) -> lis
 
     for rank, r in enumerate(keyword):
         cid = r["chunk_id"]
-        scores[cid] = scores.get(cid, 0.0) + 1.0 / (rank + 60)
+        scores[cid] = scores.get(cid, 0.0) + 1.0 / (rank + settings.rrf_rank_offset)
         by_id[cid] = {**r, "match_type": "hybrid"}
 
     for rank, r in enumerate(semantic):
         cid = r["chunk_id"]
-        scores[cid] = scores.get(cid, 0.0) + 1.0 / (rank + 60)
+        scores[cid] = scores.get(cid, 0.0) + 1.0 / (rank + settings.rrf_rank_offset)
         if cid not in by_id:
             by_id[cid] = {**r, "match_type": "hybrid"}
 

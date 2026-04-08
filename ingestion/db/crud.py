@@ -186,6 +186,18 @@ def get_pending_review_items(db: Session, role: str = None) -> list[ReviewQueueI
     return q.all()
 
 
+def get_pending_review_items_paginated(
+    db: Session,
+    role: str = None,
+    limit: int = 100,
+    offset: int = 0,
+) -> list[ReviewQueueItem]:
+    q = db.query(ReviewQueueItem).filter(ReviewQueueItem.status == "pending")
+    if role:
+        q = q.filter(ReviewQueueItem.assigned_role == role)
+    return q.order_by(ReviewQueueItem.created_at).offset(offset).limit(limit).all()
+
+
 def get_review_item(db: Session, item_id: str) -> Optional[ReviewQueueItem]:
     return db.query(ReviewQueueItem).filter(ReviewQueueItem.id == item_id).first()
 
@@ -271,6 +283,24 @@ def delete_document(db: Session, canonical_doc_id: str) -> dict | None:
         "chunk_ids": chunk_ids,
         "stored_path": stored_path,
     }
+
+
+def delete_chunks_for_canonical(db: Session, canonical_doc_id: str) -> list[str]:
+    """
+    Delete all Chunk rows (and their IndexEntry rows) for a canonical doc.
+    Returns the list of deleted chunk IDs so the caller can clean up the vector store.
+    """
+    chunk_ids = [
+        c.id for c in db.query(Chunk).filter(Chunk.canonical_doc_id == canonical_doc_id).all()
+    ]
+    if chunk_ids:
+        db.query(IndexEntry).filter(IndexEntry.chunk_id.in_(chunk_ids)).delete(
+            synchronize_session=False
+        )
+        db.query(Chunk).filter(Chunk.canonical_doc_id == canonical_doc_id).delete(
+            synchronize_session=False
+        )
+    return chunk_ids
 
 
 # ---------------------------------------------------------------------------

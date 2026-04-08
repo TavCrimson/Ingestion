@@ -35,7 +35,22 @@
       "Bash(python -c \"import pptx; print\\(pptx.__version__\\)\")",
       "Bash(grep -v \"Warning\\\\|Loading\\\\|BertModel\\\\|LOAD\\\\|Key \\\\|position_ids\\\\|UNEXPECTED\\\\|Notes:\\\\|-\\\\s*UNEXPECTED\\\\|embeddings\\\\|it/s\\\\|##\\\\|^\\\\s*$\")",
       "Bash(xargs wc:*)",
-      "Bash(wc -l /c/Users/ryan.graham/Agentic/Ingestion/ingestion/**/*.py)"
+      "Bash(wc -l /c/Users/ryan.graham/Agentic/Ingestion/ingestion/**/*.py)",
+      "Bash(python -m pytest tests/ --collect-only -q)",
+      "Bash(python -m pytest tests/ --collect-only)",
+      "Bash(python -c \"from tests.conftest import db, tmp_raw_dir, mock_vector_store, api_key; print\\('All imports successful'\\)\")",
+      "Bash(python -m pytest tests/conftest.py --fixtures -q)",
+      "Bash(python3)",
+      "Bash(xargs ls:*)",
+      "Bash(python -c ':*)",
+      "Bash(python)",
+      "Bash(echo \"Exit code: $?\")",
+      "Bash(pytest tests/ --collect-only -q)",
+      "Bash(python -c \"from ingestion.db.engine import Base; print\\(Base\\)\")",
+      "Bash(python -c \"from tests.conftest import db, api_key, tmp_raw_dir, mock_vector_store; print\\('All fixtures imported successfully'\\)\")",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(python -m pytest tests/test_config.py -v)"
     ]
   }
 }

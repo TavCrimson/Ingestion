@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 from ingestion.config import settings
 from ingestion.db import crud
 from ingestion.db.models import ReviewQueueItem
+from ingestion.storage.vector_store import vector_store
 
 
 class ReviewQueue:
@@ -80,11 +81,18 @@ class ReviewQueue:
         item.resolved_by = reviewer
         item.rejection_reason = reason
 
-        # Mark canonical doc as rejected if rejecting at doc level
+        # Mark canonical doc as rejected and clean up chunks when rejecting at doc level
         if item.canonical_doc_id and item.chunk_id is None:
             canonical = crud.get_canonical(db, item.canonical_doc_id)
             if canonical:
                 canonical.status = "rejected"
+                # Remove all chunks from DB and vector store
+                chunk_ids = crud.delete_chunks_for_canonical(db, item.canonical_doc_id)
+                for cid in chunk_ids:
+                    try:
+                        vector_store.delete(cid)
+                    except Exception:
+                        pass  # vector store may not have this chunk yet; non-fatal
 
         db.commit()
         return item

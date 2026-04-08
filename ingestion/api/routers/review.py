@@ -60,10 +60,12 @@ def _serialise(item: ReviewQueueItem, db: Session) -> ReviewItemOut:
 @router.get("/queue", response_model=list[ReviewItemOut])
 def get_queue(
     role: str | None = None,
+    limit: int = 100,
+    offset: int = 0,
     db: Session = Depends(get_db),
     _key=Depends(rate_limit),
 ):
-    items = ReviewQueue.get_pending(db, role=role)
+    items = crud.get_pending_review_items_paginated(db, role=role, limit=limit, offset=offset)
     return [_serialise(i, db) for i in items]
 
 
