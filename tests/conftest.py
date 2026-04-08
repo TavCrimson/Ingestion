@@ -1,13 +1,10 @@
 """Shared pytest fixtures for the ingestion test suite."""
 from __future__ import annotations
 
-import tempfile
-from pathlib import Path
-from unittest.mock import MagicMock, patch
-
 import pytest
 from sqlalchemy import create_engine, event, text
 from sqlalchemy.orm import sessionmaker
+from unittest.mock import MagicMock
 
 from ingestion.db.engine import Base
 from ingestion.db.models import ApiKey
@@ -41,6 +38,12 @@ def db():
             "END"
         ))
         conn.execute(text(
+            "CREATE TRIGGER IF NOT EXISTS chunks_au AFTER UPDATE ON chunks BEGIN "
+            "INSERT INTO chunks_fts(chunks_fts, rowid, chunk_id, text) VALUES ('delete', old.rowid, old.id, old.text); "
+            "INSERT INTO chunks_fts(rowid, chunk_id, text) VALUES (new.rowid, new.id, new.text); "
+            "END"
+        ))
+        conn.execute(text(
             "CREATE TRIGGER IF NOT EXISTS chunks_ad AFTER DELETE ON chunks BEGIN "
             "INSERT INTO chunks_fts(chunks_fts, rowid, chunk_id, text) "
             "VALUES ('delete', old.rowid, old.id, old.text); "
@@ -48,10 +51,11 @@ def db():
         ))
         conn.commit()
 
-    Session = sessionmaker(bind=engine)
+    Session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
     session = Session()
     yield session
     session.close()
+    engine.dispose()
 
 
 @pytest.fixture()
@@ -75,6 +79,7 @@ def mock_vector_store():
 @pytest.fixture()
 def api_key(db):
     """Seed one active API key and return the raw string."""
+    # Hardcoded for tests only — never use in production.
     raw = "test-key-abc123"
     key = ApiKey(
         key_hash=sha256_string(raw),
