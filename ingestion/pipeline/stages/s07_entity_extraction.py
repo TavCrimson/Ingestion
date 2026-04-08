@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import re
+import unicodedata
 from pathlib import Path
 
 import yaml
@@ -10,6 +11,14 @@ from sqlalchemy.orm import Session
 
 from ingestion.db import crud
 from ingestion.pipeline.stages.s03_extraction import load_extracted
+
+
+def _normalise(name: str) -> str:
+    """Lowercase + strip accents and ligatures for deduplication-safe comparison."""
+    # NFKD decomposes ligatures and accented chars; encoding to ASCII drops the diacritics
+    nfkd = unicodedata.normalize("NFKD", name.strip())
+    return nfkd.encode("ascii", "ignore").decode("ascii").lower()
+
 
 _PATTERNS_PATH = Path(__file__).parents[3] / "patterns.yaml"
 _patterns_cache: dict | None = None
@@ -30,7 +39,7 @@ def extract_entities(text: str) -> list[dict]:
     seen: set[str] = set()
 
     def _add(name: str, entity_type: str, confidence: float = 0.9):
-        norm = name.strip().lower()
+        norm = _normalise(name)
         if norm not in seen:
             seen.add(norm)
             found.append({
