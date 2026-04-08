@@ -1,11 +1,14 @@
 """Stage 8: Deduplication — hash exact-match then embedding similarity."""
 from __future__ import annotations
 
+import logging
 from sqlalchemy.orm import Session
 
 from ingestion.config import settings
 from ingestion.db import crud
 from ingestion.pipeline.stages.s03_extraction import load_extracted
+
+logger = logging.getLogger(__name__)
 
 
 def run(raw_doc_id: str, db: Session) -> dict:
@@ -61,9 +64,10 @@ def run(raw_doc_id: str, db: Session) -> dict:
                 result["similar"].append(hit["chunk_id"])
                 # Flag as similar for human review but don't block
                 result["needs_review"] = True
-    except Exception:
-        # If vector store is empty or encoder fails, skip similarity check
-        pass
+    except Exception as exc:
+        logger.warning(
+            "Embedding similarity check failed for %s — skipping: %s", raw_doc_id, exc
+        )
 
     if result["needs_review"]:
         db.commit()

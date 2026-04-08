@@ -1,6 +1,7 @@
 """POST /v1/search — keyword, semantic, or hybrid search."""
 from __future__ import annotations
 
+import logging
 import re
 from fastapi import APIRouter, Depends
 from sqlalchemy import text
@@ -13,6 +14,8 @@ from ingestion.db.engine import get_db
 from ingestion.db import crud
 from ingestion.embeddings.encoder import Encoder
 from ingestion.storage.vector_store import vector_store
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -62,7 +65,8 @@ def _keyword_search(db: Session, query: str, top_k: int, content_types: list | N
                 "authority_level": chunk.authority_level,
             })
         return results
-    except Exception:
+    except Exception as exc:
+        logger.error("FTS5 keyword search failed for query %r: %s", query, exc)
         return []
 
 
