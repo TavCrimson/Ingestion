@@ -1,0 +1,19 @@
+fastapi>=0.115
+uvicorn[standard]>=0.30
+sqlalchemy>=2.0
+pdfminer.six>=20231228
+pypdf>=4.0
+python-docx>=1.1
+python-pptx>=1.0
+lxml>=5.0
+chromadb>=0.5
+sentence-transformers>=3.0
+python-multipart>=0.0.9
+pydantic-settings>=2.0
+python-magic-bin>=0.4.14; sys_platform == "win32"
+python-magic>=0.4.27; sys_platform != "win32"
+tiktoken>=0.7
+PyYAML>=6.0
+python-dotenv>=1.0
+beautifulsoup4>=4.12
+anthropic>=0.90

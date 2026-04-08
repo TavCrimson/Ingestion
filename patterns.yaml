@@ -1,0 +1,57 @@
+# Entity extraction patterns
+# Edit this file to add product names, competitors, and version patterns.
+# The pipeline loads this file at startup — no code changes needed.
+
+products:
+  - Fusion Go
+  - FusionGo
+  - Fusion Platform
+  - Ingestion Repository
+
+competitors:
+  - Salesforce
+  - HubSpot
+  - Zendesk
+  - Intercom
+  - Freshdesk
+  - Microsoft Dynamics
+
+# Semver and version string patterns (regex)
+version_patterns:
+  - 'v\d+\.\d+(\.\d+)?'         # v1.2 or v1.2.3
+  - '\d+\.\d+(\.\d+)?\s*\(.*?\)' # 1.2.3 (build notes)
+  - 'Version\s+\d+\.\d+'         # Version 1.2
+
+# Document classification keywords mapped to content_type
+classification_rules:
+  prd:
+    - product requirements
+    - requirements document
+    - prd
+    - user story
+    - acceptance criteria
+  competitor:
+    - competitor
+    - competitive analysis
+    - market analysis
+    - comparison
+  insight:
+    - insight
+    - analysis
+    - research finding
+    - survey
+  decision:
+    - decision
+    - adr
+    - architecture decision
+    - rationale
+  metric:
+    - metric
+    - kpi
+    - dashboard
+    - performance data
+  integration:
+    - integration
+    - api spec
+    - webhook
+    - connector

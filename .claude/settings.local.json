@@ -1,0 +1,41 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/ryan.graham/AppData/Roaming/Claude/local-agent-mode-sessions/skills-plugin/ed942ae9-02db-46d0-b3e4-20c470897126/9156f29d-0b26-49ca-ac56-b38b14154a12/skills/docx/**)",
+      "Bash(pandoc --track-changes=all \"C:\\\\Users\\\\ryan.graham\\\\Downloads\\\\prd_v1.2.docx\" -o output.md)",
+      "Bash(python scripts/office/unpack.py \"C:\\\\Users\\\\ryan.graham\\\\Downloads\\\\prd_v1.2.docx\" unpacked/)",
+      "Bash(pip install:*)",
+      "Bash(python3 -m pip install defusedxml)",
+      "Bash(python3 -c \":*)",
+      "Read(//tmp/**)",
+      "Bash(pip --version)",
+      "Bash(pip list:*)",
+      "Bash(python3 -c \"import sys; print\\(sys.version\\)\")",
+      "Bash(pip3 list:*)",
+      "Bash(python3 -m pip list)",
+      "Bash(python3 -c \"import sqlite3; print\\(''sqlite3:'', sqlite3.sqlite_version\\)\")",
+      "Bash(python3 -c \"import json; print\\(''json: ok''\\)\")",
+      "Bash(python3 -c \"import hashlib; print\\(''hashlib: ok''\\)\")",
+      "Bash(python3 -c \"import pathlib; print\\(''pathlib: ok''\\)\")",
+      "Bash(python3 -m pip install -r requirements.txt -q)",
+      "Bash(python3 scripts/init_db.py)",
+      "Bash(python3 scripts/run_pipeline.py \"C:/Users/ryan.graham/Downloads/prd_v1.2.docx\")",
+      "Bash(python3 scripts/review_cli.py)",
+      "Bash(python3 -c \"from ingestion.api.app import app; print\\(''App loaded OK''\\); print\\(''Routes:''\\); [print\\('' '', r.path\\) for r in app.routes]\")",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(python scripts/init_db.py --seed-key Ryan --label \"Ryan\")",
+      "Bash(python -c \"from ingestion.api.routers import documents; print\\(''OK:'', documents.router.routes\\)\")",
+      "Bash(curl -s http://localhost:8000/openapi.json)",
+      "Bash(python -c \"import sys,json; routes=[r[''''path''''] for r in json.load\\(sys.stdin\\)[''''paths''''].keys\\(\\)]; print\\(''''\\\\n''''.join\\(routes\\)\\)\")",
+      "Bash(python -c \"import sys,json; data=json.load\\(sys.stdin\\); print\\(''''\\\\n''''.join\\(data[''''paths''''].keys\\(\\)\\)\\)\")",
+      "Bash(python -c \":*)",
+      "Bash(python -c \"import anthropic; print\\(anthropic.__version__\\)\")",
+      "Bash(python -m pip install anthropic)",
+      "Bash(python -m pip install python-pptx)",
+      "Bash(python -c \"import pptx; print\\(pptx.__version__\\)\")",
+      "Bash(grep -v \"Warning\\\\|Loading\\\\|BertModel\\\\|LOAD\\\\|Key \\\\|position_ids\\\\|UNEXPECTED\\\\|Notes:\\\\|-\\\\s*UNEXPECTED\\\\|embeddings\\\\|it/s\\\\|##\\\\|^\\\\s*$\")",
+      "Bash(xargs wc:*)",
+      "Bash(wc -l /c/Users/ryan.graham/Agentic/Ingestion/ingestion/**/*.py)"
+    ]
+  }
+}
