@@ -186,6 +186,18 @@ def get_pending_review_items(db: Session, role: str = None) -> list[ReviewQueueI
     return q.all()
 
 
+def get_pending_review_items_paginated(
+    db: Session,
+    role: str = None,
+    limit: int = 100,
+    offset: int = 0,
+) -> list[ReviewQueueItem]:
+    q = db.query(ReviewQueueItem).filter(ReviewQueueItem.status == "pending")
+    if role:
+        q = q.filter(ReviewQueueItem.assigned_role == role)
+    return q.order_by(ReviewQueueItem.created_at).offset(offset).limit(limit).all()
+
+
 def get_review_item(db: Session, item_id: str) -> Optional[ReviewQueueItem]:
     return db.query(ReviewQueueItem).filter(ReviewQueueItem.id == item_id).first()
 
