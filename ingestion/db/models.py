@@ -32,6 +32,7 @@ class RawDocument(Base):
     file_hash = Column(String(64), nullable=False, index=True)
     mime_type = Column(String, nullable=True)
     file_size_bytes = Column(Integer, nullable=True)
+    extracted_text = Column(Text, nullable=True)
     created_at = Column(DateTime(timezone=True), default=_now, nullable=False)
 
     canonical = relationship("CanonicalDocument", back_populates="raw_doc", uselist=False)

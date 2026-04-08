@@ -28,7 +28,7 @@ def clean(text: str) -> str:
 
 
 def run(raw_doc_id: str, db: Session) -> str:
-    """Clean extracted text and update the sidecar. Returns cleaned text."""
+    """Clean extracted text, update DB field and sidecar. Returns cleaned text."""
     import json
     from pathlib import Path
 
@@ -39,5 +39,17 @@ def run(raw_doc_id: str, db: Session) -> str:
     data = load_extracted(raw_doc_id, db)
     cleaned = clean(data["text"])
     data["text"] = cleaned
-    sidecar_path.write_text(json.dumps(data), encoding="utf-8")
+
+    payload = json.dumps(data)
+
+    # Update DB field (primary)
+    raw_doc.extracted_text = payload
+    db.flush()
+
+    # Update sidecar (best-effort)
+    try:
+        sidecar_path.write_text(payload, encoding="utf-8")
+    except OSError:
+        pass
+
     return cleaned
