@@ -202,3 +202,15 @@ class ApiKey(Base):
     rate_limit_per_minute = Column(Integer, nullable=False, default=60)
     active = Column(Boolean, nullable=False, default=True)
     created_at = Column(DateTime(timezone=True), default=_now, nullable=False)
+
+
+# ---------------------------------------------------------------------------
+# Operational — Rate limit persistence
+# ---------------------------------------------------------------------------
+
+class RateLimitEntry(Base):
+    __tablename__ = "rate_limit_entries"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    key_hash = Column(String(64), nullable=False, index=True)
+    requested_at = Column(DateTime(timezone=True), nullable=False)

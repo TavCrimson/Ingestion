@@ -19,7 +19,7 @@ from sqlalchemy import text
 
 from ingestion.config import settings
 from ingestion.db.engine import Base, engine, SessionLocal
-from ingestion.db.models import ApiKey
+from ingestion.db.models import ApiKey, RateLimitEntry  # noqa: F401 — ensures all models are registered
 from ingestion.storage.file_hash import sha256_string
 
 
