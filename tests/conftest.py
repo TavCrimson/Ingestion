@@ -39,14 +39,13 @@ def db():
         ))
         conn.execute(text(
             "CREATE TRIGGER IF NOT EXISTS chunks_au AFTER UPDATE ON chunks BEGIN "
-            "INSERT INTO chunks_fts(chunks_fts, rowid, chunk_id, text) VALUES ('delete', old.rowid, old.id, old.text); "
+            "DELETE FROM chunks_fts WHERE rowid = old.rowid; "
             "INSERT INTO chunks_fts(rowid, chunk_id, text) VALUES (new.rowid, new.id, new.text); "
             "END"
         ))
         conn.execute(text(
             "CREATE TRIGGER IF NOT EXISTS chunks_ad AFTER DELETE ON chunks BEGIN "
-            "INSERT INTO chunks_fts(chunks_fts, rowid, chunk_id, text) "
-            "VALUES ('delete', old.rowid, old.id, old.text); "
+            "DELETE FROM chunks_fts WHERE rowid = old.rowid; "
             "END"
         ))
         conn.commit()
