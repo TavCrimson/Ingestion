@@ -1,4 +1,5 @@
 from pathlib import Path
+from pydantic import field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -29,6 +30,28 @@ class Settings(BaseSettings):
 
     # Reciprocal Rank Fusion offset
     rrf_rank_offset: int = 60
+
+    @field_validator("rrf_rank_offset")
+    @classmethod
+    def rrf_offset_positive(cls, v: int) -> int:
+        if v <= 0:
+            raise ValueError("rrf_rank_offset must be a positive integer")
+        return v
+
+    @field_validator("chat_context_chunks")
+    @classmethod
+    def chat_context_chunks_positive(cls, v: int) -> int:
+        if v <= 0:
+            raise ValueError("chat_context_chunks must be a positive integer")
+        return v
+
+    @model_validator(mode="after")
+    def dedup_thresholds_ordered(self) -> "Settings":
+        if self.dedup_similar_lower_bound >= self.dedup_near_duplicate_threshold:
+            raise ValueError(
+                "dedup_similar_lower_bound must be less than dedup_near_duplicate_threshold"
+            )
+        return self
 
     @property
     def raw_store_dir(self) -> Path:

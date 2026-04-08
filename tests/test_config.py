@@ -1,4 +1,7 @@
 """Tests for configurable thresholds."""
+import pytest
+from pydantic import ValidationError
+
 from ingestion.config import settings
 
 
@@ -17,3 +20,28 @@ def test_default_threshold_values():
     assert settings.dedup_near_duplicate_threshold == 0.95
     assert settings.dedup_similar_lower_bound == 0.80
     assert settings.rrf_rank_offset == 60
+
+
+def test_dedup_thresholds_must_be_ordered():
+    """near_duplicate must be greater than similar_lower_bound."""
+    from ingestion.config import Settings
+
+    with pytest.raises(ValidationError):
+        Settings(
+            dedup_near_duplicate_threshold=0.5,
+            dedup_similar_lower_bound=0.9,  # lower_bound > near_duplicate → invalid
+        )
+
+
+def test_rrf_rank_offset_must_be_positive():
+    from ingestion.config import Settings
+
+    with pytest.raises(ValidationError):
+        Settings(rrf_rank_offset=0)
+
+
+def test_chat_context_chunks_must_be_positive():
+    from ingestion.config import Settings
+
+    with pytest.raises(ValidationError):
+        Settings(chat_context_chunks=0)
