@@ -3,12 +3,9 @@ from __future__ import annotations
 
 from sqlalchemy.orm import Session
 
+from ingestion.config import settings
 from ingestion.db import crud
 from ingestion.pipeline.stages.s03_extraction import load_extracted
-
-# Cosine similarity threshold for near-duplicate detection
-_NEAR_DUPLICATE_THRESHOLD = 0.95
-_SIMILAR_LOWER_BOUND = 0.80
 
 
 def run(raw_doc_id: str, db: Session) -> dict:
@@ -56,11 +53,11 @@ def run(raw_doc_id: str, db: Session) -> dict:
 
         for hit in hits:
             score = hit["score"]
-            if score >= _NEAR_DUPLICATE_THRESHOLD:
+            if score >= settings.dedup_near_duplicate_threshold:
                 result["similar"].append(hit["chunk_id"])
                 result["needs_review"] = True
                 _flag_for_review(raw_doc_id, hit["chunk_id"], "embedding_near_duplicate", db)
-            elif score >= _SIMILAR_LOWER_BOUND:
+            elif score >= settings.dedup_similar_lower_bound:
                 result["similar"].append(hit["chunk_id"])
                 # Flag as similar for human review but don't block
                 result["needs_review"] = True

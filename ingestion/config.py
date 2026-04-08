@@ -23,6 +23,13 @@ class Settings(BaseSettings):
     chat_model: str = "claude-haiku-4-5-20251001"
     chat_context_chunks: int = 8
 
+    # Deduplication thresholds
+    dedup_near_duplicate_threshold: float = 0.95
+    dedup_similar_lower_bound: float = 0.80
+
+    # Reciprocal Rank Fusion offset
+    rrf_rank_offset: int = 60
+
     @property
     def raw_store_dir(self) -> Path:
         return Path(self.raw_store_path)
